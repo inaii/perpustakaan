@@ -31,6 +31,19 @@ public class Peminjaman {
     @Column(nullable = false)
     private Date tglPinjam;
 
+    //tanggl kembalinya buku, maksimal 10 hari   
+    @Column()
+    private Date tglKembali;
+
+    @Column(columnDefinition = "boolean default true")
+    private Boolean status;
+
+    @Column(columnDefinition = "integer default 0")
+    private int tagihan;
+
+    
+
+
     //memasang setter dan getter
 
     public Long getId() {
@@ -67,5 +80,28 @@ public class Peminjaman {
     public void setKatalog(Katalog katalog){
         this.katalog = katalog;
     }
+
+    public void setTagihan(int tagihan){
+        this.tagihan = tagihan;
+    }
+
+    public int getTagihan(){
+        return this.tagihan;
+    }
+
+    public Date getTglKembali() {
+        return this.tglKembali;
+    }
+    public void setTglKembali(Date tglKembali){
+        this.tglKembali = tglKembali;
+    }
+
+    public Boolean getStatus() {
+        return this.status;
+    }
+    public void setStatus(Boolean status){
+        this.status = status;
+    }
+
 
 }
