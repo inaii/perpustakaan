@@ -55,7 +55,6 @@ public class Katalog {
     public String getAuthor(){
         return this.author;
     }
-
     //tahun
     public void setTahun(int tahun){
         this.tahun = tahun;
@@ -70,6 +69,4 @@ public class Katalog {
     public String getSinopsis(){
         return this.sinopsis;
     }
-
-    
 }
