@@ -2,8 +2,11 @@ package com.project.perpustakaan.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
+import com.project.perpustakaan.model.Katalog;
 import com.project.perpustakaan.model.Peminjaman;
+import com.project.perpustakaan.repo.KatalogRepo;
 import com.project.perpustakaan.repo.PeminjamanRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +24,8 @@ public class CPeminjaman {
 
     @Autowired
     private PeminjamanRepo peminjamanRepo;
+    @Autowired
+    private KatalogRepo katalogRepo;
     
     //menampilkan semua
     @GetMapping(path = "/")
@@ -38,7 +43,13 @@ public class CPeminjaman {
     // yang di edti adalah id member, id katalog dan dan tanggal pinjam
     @PostMapping(path="/")
     public Peminjaman addPeminjaman(@RequestBody Peminjaman peminjaman){
-        return peminjamanRepo.save(peminjaman);
+        Katalog katalog = katalogRepo.findById(peminjaman.getIdKatalog()).get();
+        int jumlah = katalog.getJumlah();
+        if(jumlah>=1){
+          katalog.setJumlah(--jumlah);
+          return peminjamanRepo.save(peminjaman);
+        }
+        return null;
     }
 
     //update
@@ -50,6 +61,7 @@ public class CPeminjaman {
        peminjaman.setTglPinjam(newPeminjaman.getTglPinjam());
        peminjaman.setIdKatalog(newPeminjaman.getIdKatalog());
        peminjaman.setIdMember(newPeminjaman.getIdMember());
+       peminjaman.setStatus(newPeminjaman.getStatus());
         return peminjamanRepo.save(peminjaman);
 
       })
@@ -58,37 +70,37 @@ public class CPeminjaman {
       });
     }
     
-    //delete
+    //delete. hanya dapat di hapus jika statusnya false
     @DeleteMapping(path= "/{id}")
     public void deletePeminjaman(@PathVariable Long id){
-        peminjamanRepo.deleteById(id);
+      Peminjaman peminjaman = peminjamanRepo.findById(id).get();
+      if (!peminjaman.getStatus()) {
+        peminjamanRepo.deleteById(id);  
+      }
     } 
     
-    //membuat daftar tagihan yang masuk dimana
-
-    // yang terjadi dalam tagihan
-    // cek terlambatan
-    // menjumlah tagihan
-    // membuat status
-
+    //mengubah status peminjaman dan menghitung denda peminjaman
     @PutMapping("/pengembalian/{id}")
     Peminjaman updateTagihan(@RequestBody Peminjaman newPeminjaman, @PathVariable Long id) {
       
-      return peminjamanRepo.findById(id)
-      .map(peminjaman -> {
-       peminjaman.setTglKembali(newPeminjaman.getTglKembali());
-       peminjaman.setTagihan(
-        //newPeminjaman.getTglPinjam()- newPeminjaman.getTglKembali()
-         2000
-         );//perlu dilakukan pengurangan dari keterlambatan
-       peminjaman.setStatus(false);
-       //ditambah stok buku kita tambah 1;
-       return peminjamanRepo.save(peminjaman);
+      Peminjaman peminjaman = peminjamanRepo.findById(id).get();
+        try {
+          if(peminjaman.getStatus()){
+            Katalog katalog = katalogRepo.findById(peminjaman.getIdKatalog()).get();  
+            peminjaman.setTglKembali(newPeminjaman.getTglKembali());
+            peminjaman.setTagihan(2000);//perlu untuk menghitung tanggal
+            peminjaman.setStatus(false);
+            int jumlah = katalog.getJumlah();
+            katalog.setJumlah(++jumlah);
+          }
+          return peminjamanRepo.save(peminjaman);
+        } catch (Exception e) {
+          System.out.println(e.getMessage());
+          return peminjamanRepo.save(newPeminjaman);
+        }
 
-      })
-      .orElseGet(() -> {
-        return peminjamanRepo.save(newPeminjaman);
-      });
+      
     }
+
     
 }
