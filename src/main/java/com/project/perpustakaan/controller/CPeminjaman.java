@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.TimeZone;
 
 import com.project.perpustakaan.model.Katalog;
 import com.project.perpustakaan.model.Peminjaman;
@@ -28,8 +29,12 @@ public class CPeminjaman {
     private PeminjamanRepo peminjamanRepo;
     @Autowired
     private KatalogRepo katalogRepo;
+<<<<<<< HEAD
     SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
     //menampilkan semua
+=======
+  
+>>>>>>> 10d88d5debe121c43c735aa88d992e4b22bb0271
     @GetMapping(path = "/")
     public List<Peminjaman> get_all(){
         return peminjamanRepo.findAll();
@@ -46,6 +51,10 @@ public class CPeminjaman {
     @PostMapping(path="/")
     public Peminjaman addPeminjaman(@RequestBody Peminjaman peminjaman){
         Katalog katalog = katalogRepo.findById(peminjaman.getIdKatalog()).get();
+<<<<<<< HEAD
+=======
+        peminjaman.setTglPinjam(Calendar.getInstance(TimeZone.getTimeZone("Asia/Jakarta")).getTime());
+>>>>>>> 10d88d5debe121c43c735aa88d992e4b22bb0271
         int jumlah = katalog.getJumlah();
         if(jumlah>=1){
           katalog.setJumlah(--jumlah);
@@ -93,11 +102,17 @@ public class CPeminjaman {
             peminjaman.setStatus(false);
             int jumlah = katalog.getJumlah();
             katalog.setJumlah(++jumlah);
+<<<<<<< HEAD
+=======
+            //memasukkan tanggal kembali
+              peminjaman.setTglKembali(Calendar.getInstance().getTime());
+>>>>>>> 10d88d5debe121c43c735aa88d992e4b22bb0271
 
             //menghitung durasi peminjaman
             
             long denda = 500;
             Date d1 = peminjaman.getTglPinjam();;
+<<<<<<< HEAD
             Date d2 = newPeminjaman.getTglKembali();
             peminjaman.setTglKembali(newPeminjaman.getTglKembali());
             long diff = d2.getTime()-d1.getTime();
@@ -108,6 +123,15 @@ public class CPeminjaman {
             if(diffDays>7){
               peminjaman.setTagihan((diffDays-7)*denda);
             }else peminjaman.setTagihan(0);//perlu untuk menghitung tanggal
+=======
+            Date d2 = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jakarta")).getTime();  
+            long diff = d2.getTime()-d1.getTime();
+            long diffDays = diff / (24 * 60 * 60 * 1000);
+            System.out.println("HARIIII = "+diffDays);
+            // if(diffDays>7){
+            //   peminjaman.setTagihan((diffDays-7)* denda);
+            // }else peminjaman.setTagihan(0);//perlu untuk menghitung tanggal
+>>>>>>> 10d88d5debe121c43c735aa88d992e4b22bb0271
             
           }
           return peminjamanRepo.save(peminjaman);
@@ -116,7 +140,13 @@ public class CPeminjaman {
           return peminjamanRepo.save(newPeminjaman);
         }
 
+<<<<<<< HEAD
       
     }    
+=======
+
+        
+    }
+>>>>>>> 10d88d5debe121c43c735aa88d992e4b22bb0271
 
 }
